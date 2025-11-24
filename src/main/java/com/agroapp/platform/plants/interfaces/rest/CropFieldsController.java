@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * Follows hexagonal architecture: delegates to services and uses assemblers for transformations.
  */
 @RestController
-@RequestMapping("/api/v1/CropFields")
+@RequestMapping("/api/v1/crop-fields")
 @Tag(name = "CropFields", description = "CropField Management Endpoints")
 public class CropFieldsController {
 
@@ -76,7 +76,7 @@ public class CropFieldsController {
 
     /**
      * Gets all CropFields.
-     * GET /api/v1/CropFields
+     * GET /api/v1/crop-fields
      */
     @GetMapping
     public ResponseEntity<List<CropFieldResource>> getAllCropFields() {
@@ -131,7 +131,7 @@ public class CropFieldsController {
 
     /**
      * Gets a CropField by its associated Field ID (1:1 relationship).
-     * GET /api/v1/CropFields/field/{fieldId}
+     * GET /api/v1/crop-fields/field/{fieldId}
      */
     @GetMapping("/field/{fieldId}")
     public ResponseEntity<CropFieldResource> getCropFieldByFieldId(@PathVariable Long fieldId) {

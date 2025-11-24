@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * Follows hexagonal architecture: delegates to services and uses assemblers for transformations.
  */
 @RestController
-@RequestMapping("/api/v1/CommunityRecommendation")
+@RequestMapping("/api/v1/community-recommendations")
 @Tag(name = "CommunityRecommendation", description = "Community Recommendation Endpoints")
 public class CommunityRecommendationController {
 
@@ -100,7 +100,7 @@ public class CommunityRecommendationController {
 
     /**
      * Gets all CommunityRecommendations.
-     * GET /api/v1/CommunityRecommendation
+     * GET /api/v1/community-recommendations
      */
     @GetMapping
     public ResponseEntity<List<CommunityRecommendationResource>> getAllCommunityRecommendations() {
@@ -116,7 +116,7 @@ public class CommunityRecommendationController {
 
     /**
      * Updates a CommunityRecommendation.
-     * PUT /api/v1/CommunityRecommendation/{id}
+     * PUT /api/v1/community-recommendations/{id}
      */
     @PutMapping("/{id}")
     public ResponseEntity<CommunityRecommendationResource> updateCommunityRecommendation(@PathVariable Long id, @RequestBody UpdateCommunityRecommendationResource resource) {

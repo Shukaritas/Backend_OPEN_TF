@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * Follows hexagonal architecture: delegates to services and uses assemblers for transformations.
  */
 @RestController
-@RequestMapping("/api/Tasks")
+@RequestMapping("/api/v1/tasks")
 @Tag(name = "Tasks", description = "Task Management Endpoints")
 public class TasksController {
 
@@ -117,8 +117,8 @@ public class TasksController {
     }
 
     /**
-     * Gets all tasks associated with a specific field.
-     * GET /api/Tasks/field/{fieldId}
+     * Gets all Tasks for a specific Field.
+     * GET /api/v1/tasks/field/{fieldId}
      */
     @GetMapping("/field/{fieldId}")
     public ResponseEntity<List<TaskResource>> getTasksByFieldId(@PathVariable Long fieldId) {

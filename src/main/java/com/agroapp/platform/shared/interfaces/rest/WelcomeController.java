@@ -30,12 +30,13 @@ public class WelcomeController {
         Map<String, String> endpoints = new HashMap<>();
         endpoints.put("API Documentation", "/swagger-ui.html");
         endpoints.put("API Docs JSON", "/v3/api-docs");
-        endpoints.put("CommunityRecommendation", "/api/v1/CommunityRecommendation");
-        endpoints.put("CropField", "/api/v1/CropField");
-        endpoints.put("Field", "/api/v1/Field");
-        endpoints.put("ProgressHistory", "/api/v1/ProgressHistory");
-        endpoints.put("Task", "/api/v1/Task");
-        endpoints.put("Users", "/api/v1/Users");
+        endpoints.put("Community Recommendations", "/api/v1/community-recommendations");
+        endpoints.put("Crop Fields", "/api/v1/crop-fields");
+        endpoints.put("Fields", "/api/v1/fields");
+        endpoints.put("Progress History", "/api/v1/progress");
+        endpoints.put("Tasks", "/api/v1/tasks");
+        endpoints.put("Users", "/api/v1/users");
+        endpoints.put("Storage", "/api/v1/storage");
         response.put("endpoints", endpoints);
 
         return response;

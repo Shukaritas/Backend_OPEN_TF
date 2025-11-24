@@ -17,7 +17,15 @@ public class Field extends AuditableAbstractAggregateRoot<Field> {
     @Column(nullable = false)
     private Long userId;
 
+    /**
+     * Image stored as Base64 encoded string.
+     * Uses @Lob (Large Object) to support very long text strings.
+     * In MySQL, this maps to LONGTEXT type which can store up to 4GB.
+     */
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String imageUrl;
+
     private String name;
     private String location;
     private String fieldSize;
@@ -33,7 +41,7 @@ public class Field extends AuditableAbstractAggregateRoot<Field> {
      * Business logic: A Field must always be owned by a user.
      *
      * @param userId The ID of the user who owns this field
-     * @param imageUrl Optional image URL for the field
+     * @param imageUrl Optional Base64 encoded image string (stored directly in database)
      * @param name Name of the field
      * @param location Geographic location of the field
      * @param fieldSize Size description of the field
@@ -66,9 +74,9 @@ public class Field extends AuditableAbstractAggregateRoot<Field> {
     }
 
     /**
-     * Updates the field's image URL.
+     * Updates the field's image (Base64 encoded string).
      *
-     * @param imageUrl New image URL
+     * @param imageUrl New Base64 encoded image string
      * @return The updated Field instance (fluent interface)
      */
     public Field updateImage(String imageUrl) {

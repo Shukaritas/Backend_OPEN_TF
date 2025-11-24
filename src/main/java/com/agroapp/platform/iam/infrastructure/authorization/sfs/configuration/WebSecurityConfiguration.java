@@ -48,6 +48,10 @@ public class WebSecurityConfiguration {
                 .requestMatchers("/api/v1/users/sign-up").permitAll()
                 .requestMatchers("/api/v1/users/sign-in").permitAll()
 
+                // Public endpoints - File Storage
+                .requestMatchers("/api/v1/storage/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
+
                 // Public endpoints - Swagger/OpenAPI Documentation
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()

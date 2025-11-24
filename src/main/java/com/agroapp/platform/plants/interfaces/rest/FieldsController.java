@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * Follows hexagonal architecture: delegates to services and uses assemblers for transformations.
  */
 @RestController
-@RequestMapping("/api/v1/Fields")
+@RequestMapping("/api/v1/fields")
 @Tag(name = "Fields", description = "Field Management Endpoints")
 public class FieldsController {
 
@@ -42,7 +42,7 @@ public class FieldsController {
 
     /**
      * Creates a new Field and automatically creates its associated ProgressHistory.
-     * POST /api/v1/Fields
+     * POST /api/v1/fields
      */
     @PostMapping
     public ResponseEntity<FieldResource> createField(@RequestBody CreateFieldResource resource) {
@@ -103,7 +103,7 @@ public class FieldsController {
 
     /**
      * Gets a Field by its ID.
-     * GET /api/v1/Fields/{id}
+     * GET /api/v1/fields/{id}
      */
     @GetMapping("/{id}")
     public ResponseEntity<FieldResource> getFieldById(@PathVariable Long id) {
