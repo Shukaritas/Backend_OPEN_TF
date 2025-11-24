@@ -4,24 +4,25 @@ import com.agroapp.platform.plants.domain.model.queries.*;
 import com.agroapp.platform.plants.domain.services.*;
 import com.agroapp.platform.plants.interfaces.rest.resources.*;
 import com.agroapp.platform.plants.interfaces.rest.transform.*;
-import com.agroapp.platform.plants.domain.model.queries.GetAllCropFieldsQuery;
-import com.agroapp.platform.plants.domain.model.queries.GetCropFieldByFieldIdQuery;
-import com.agroapp.platform.plants.domain.model.queries.GetCropFieldByIdQuery;
-import com.agroapp.platform.plants.domain.services.CropFieldCommandService;
-import com.agroapp.platform.plants.domain.services.CropFieldQueryService;
-import com.agroapp.platform.plants.interfaces.rest.resources.CreateCropFieldResource;
-import com.agroapp.platform.plants.interfaces.rest.resources.CropFieldResource;
-import com.agroapp.platform.plants.interfaces.rest.resources.UpdateCropFieldResource;
-import com.agroapp.platform.plants.interfaces.rest.transform.CreateCropFieldCommandFromResourceAssembler;
-import com.agroapp.platform.plants.interfaces.rest.transform.CropFieldResourceFromEntityAssembler;
-import com.agroapp.platform.plants.interfaces.rest.transform.UpdateCropFieldCommandFromResourceAssembler;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * REST Controller for CropField entity.
+ * Handles HTTP requests related to CropField management.
+ * CropField has a 1:1 relationship with Field.
+ * Follows hexagonal architecture: delegates to services and uses assemblers for transformations.
+ */
 @RestController
 @RequestMapping("/api/v1/CropFields")
 @Tag(name = "CropFields", description = "CropField Management Endpoints")
@@ -36,60 +37,112 @@ public class CropFieldsController {
         this.cropFieldQueryService = cropFieldQueryService;
     }
 
+    /**
+     * Creates a new CropField associated with an existing Field.
+     * POST /api/v1/CropFields
+     */
+    @Operation(
+            summary = "Create a new CropField",
+            description = "Creates a new CropField associated with an existing Field (1:1 relationship). " +
+                    "The 'status' field is an ENUM with allowed values: Healthy, Attention, Critical. " +
+                    "These represent the health status of the crop in the field."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "CropField successfully created",
+                    content = @Content(schema = @Schema(implementation = CropFieldResource.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input - Check that fieldId exists and status is one of: Healthy, Attention, Critical"
+            )
+    })
     @PostMapping
     public ResponseEntity<CropFieldResource> createCropField(@RequestBody CreateCropFieldResource resource) {
+        // Transform Resource to Command using Assembler
         var command = CreateCropFieldCommandFromResourceAssembler.toCommandFromResource(resource);
+
+        // Execute command through service
         var cropField = cropFieldCommandService.handle(command);
         if (cropField.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
+
+        // Transform Entity to Resource using Assembler
         var cropFieldResource = CropFieldResourceFromEntityAssembler.toResourceFromEntity(cropField.get());
         return new ResponseEntity<>(cropFieldResource, HttpStatus.CREATED);
     }
 
+    /**
+     * Gets all CropFields.
+     * GET /api/v1/CropFields
+     */
     @GetMapping
     public ResponseEntity<List<CropFieldResource>> getAllCropFields() {
         var query = new GetAllCropFieldsQuery();
         var cropFields = cropFieldQueryService.handle(query);
+
         var cropFieldResources = cropFields.stream()
                 .map(CropFieldResourceFromEntityAssembler::toResourceFromEntity)
-                .toList();
+                .collect(Collectors.toList());
+
         return ResponseEntity.ok(cropFieldResources);
     }
 
+    /**
+     * Gets a CropField by its ID.
+     * GET /api/v1/CropFields/{id}
+     */
     @GetMapping("/{id}")
     public ResponseEntity<CropFieldResource> getCropFieldById(@PathVariable Long id) {
         var query = new GetCropFieldByIdQuery(id);
         var cropField = cropFieldQueryService.handle(query);
+
         if (cropField.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
         var cropFieldResource = CropFieldResourceFromEntityAssembler.toResourceFromEntity(cropField.get());
         return ResponseEntity.ok(cropFieldResource);
     }
 
+    /**
+     * Updates a CropField's crop attribute.
+     * PUT /api/v1/CropFields/{id}
+     */
     @PutMapping("/{id}")
     public ResponseEntity<CropFieldResource> updateCropField(@PathVariable Long id, @RequestBody UpdateCropFieldResource resource) {
+        // Transform Resource to Command using Assembler (includes ID in the resource)
         var command = UpdateCropFieldCommandFromResourceAssembler.toCommandFromResource(
                 new UpdateCropFieldResource(id, resource.crop())
         );
+
+        // Execute command through service
         var cropField = cropFieldCommandService.handle(command);
         if (cropField.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
+
+        // Transform Entity to Resource using Assembler
         var cropFieldResource = CropFieldResourceFromEntityAssembler.toResourceFromEntity(cropField.get());
         return ResponseEntity.ok(cropFieldResource);
     }
 
+    /**
+     * Gets a CropField by its associated Field ID (1:1 relationship).
+     * GET /api/v1/CropFields/field/{fieldId}
+     */
     @GetMapping("/field/{fieldId}")
     public ResponseEntity<CropFieldResource> getCropFieldByFieldId(@PathVariable Long fieldId) {
         var query = new GetCropFieldByFieldIdQuery(fieldId);
         var cropField = cropFieldQueryService.handle(query);
+
         if (cropField.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
         var cropFieldResource = CropFieldResourceFromEntityAssembler.toResourceFromEntity(cropField.get());
         return ResponseEntity.ok(cropFieldResource);
     }
 }
-

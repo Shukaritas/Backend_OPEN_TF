@@ -7,8 +7,11 @@ import com.agroapp.platform.iam.domain.services.UserCommandService;
 import com.agroapp.platform.iam.domain.services.UserQueryService;
 import com.agroapp.platform.iam.interfaces.rest.resources.*;
 import com.agroapp.platform.iam.interfaces.rest.transform.*;
-import com.agroapp.platform.iam.interfaces.rest.resources.*;
-import com.agroapp.platform.iam.interfaces.rest.transform.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,25 @@ public class UsersController {
         this.userQueryService = userQueryService;
     }
 
+    @Operation(
+            summary = "Register a new user",
+            description = "Creates a new user account with validations: " +
+                    "DNI must be exactly 8 digits, " +
+                    "password must be at least 5 characters, " +
+                    "phone number must include country prefix (e.g., +51987654321)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "User successfully created",
+                    content = @Content(schema = @Schema(implementation = UserResource.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input - Check validations: " +
+                            "DNI (8 digits), password (min 5 chars), phone (+prefix)"
+            )
+    })
     @PostMapping("/sign-up")
     public ResponseEntity<UserResource> signUp(@RequestBody SignUpUserResource resource) {
         var command = SignUpCommandFromResourceAssembler.toCommandFromResource(resource);

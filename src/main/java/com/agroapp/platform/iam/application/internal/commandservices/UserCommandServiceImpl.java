@@ -30,8 +30,11 @@ public class UserCommandServiceImpl implements UserCommandService {
             throw new RuntimeException("Email already exists");
         }
         if (userRepository.existsByIdentificator(command.identificator())) {
-            throw new RuntimeException("Identificator already exists");
+            throw new RuntimeException("DNI (identificator) already exists");
         }
+
+        // Validate raw password before hashing
+        User.validateRawPassword(command.password());
 
         String hashedPassword = hashingService.encode(command.password());
         User user = new User(

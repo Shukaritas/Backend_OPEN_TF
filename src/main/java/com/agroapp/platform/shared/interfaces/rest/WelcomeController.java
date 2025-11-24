@@ -12,12 +12,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
-@Tag(name = "Welcome", description = "API Welcome Endpoint")
+@Tag(name = "AgroApp", description = "API Endpoint configurations")
 @RestController
 @RequestMapping("/")
 public class WelcomeController {
     @GetMapping
-    @Operation(summary = "API Welcome Message", description = "Provides information and available endpoints of the API")
+    @Operation(summary = "AgroApp Logic", description = "Provides information and available endpoints of the API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation")
     })
