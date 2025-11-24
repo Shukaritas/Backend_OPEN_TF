@@ -19,7 +19,8 @@ public class UpdateCropFieldCommandFromResourceAssembler {
     public static UpdateCropFieldCommand toCommandFromResource(UpdateCropFieldResource resource) {
         return new UpdateCropFieldCommand(
                 resource.cropFieldId(),
-                resource.crop()
+                resource.crop(),
+                resource.status()
         );
     }
 }

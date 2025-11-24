@@ -1,5 +1,6 @@
 package com.agroapp.platform.plants.interfaces.rest;
 
+import com.agroapp.platform.plants.domain.model.commands.DeleteCropFieldCommand;
 import com.agroapp.platform.plants.domain.model.queries.*;
 import com.agroapp.platform.plants.domain.services.*;
 import com.agroapp.platform.plants.interfaces.rest.resources.*;
@@ -108,14 +109,34 @@ public class CropFieldsController {
     }
 
     /**
-     * Updates a CropField's crop attribute.
-     * PUT /api/v1/CropFields/{id}
+     * Updates a CropField's crop attribute and status.
+     * PUT /api/v1/crop-fields/{id}
      */
+    @Operation(
+            summary = "Update a CropField",
+            description = "Updates the crop name and/or status of an existing CropField. " +
+                    "Status must be one of: Healthy, Attention, Critical."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "CropField successfully updated",
+                    content = @Content(schema = @Schema(implementation = CropFieldResource.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request - Check that status is one of: Healthy, Attention, Critical"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "CropField not found"
+            )
+    })
     @PutMapping("/{id}")
     public ResponseEntity<CropFieldResource> updateCropField(@PathVariable Long id, @RequestBody UpdateCropFieldResource resource) {
         // Transform Resource to Command using Assembler (includes ID in the resource)
         var command = UpdateCropFieldCommandFromResourceAssembler.toCommandFromResource(
-                new UpdateCropFieldResource(id, resource.crop())
+                new UpdateCropFieldResource(id, resource.crop(), resource.status())
         );
 
         // Execute command through service
@@ -127,6 +148,31 @@ public class CropFieldsController {
         // Transform Entity to Resource using Assembler
         var cropFieldResource = CropFieldResourceFromEntityAssembler.toResourceFromEntity(cropField.get());
         return ResponseEntity.ok(cropFieldResource);
+    }
+
+    /**
+     * Deletes a CropField by its ID.
+     * DELETE /api/v1/crop-fields/{id}
+     */
+    @Operation(
+            summary = "Delete a CropField",
+            description = "Deletes an existing CropField by its ID. This removes the crop association from the field."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "CropField successfully deleted"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "CropField not found"
+            )
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCropField(@PathVariable Long id) {
+        var command = new DeleteCropFieldCommand(id);
+        cropFieldCommandService.handle(command);
+        return ResponseEntity.noContent().build();
     }
 
     /**
