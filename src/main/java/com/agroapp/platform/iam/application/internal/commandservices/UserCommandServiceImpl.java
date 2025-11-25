@@ -5,8 +5,10 @@ import com.agroapp.platform.iam.application.internal.outboundservices.tokens.Tok
 import com.agroapp.platform.iam.domain.model.aggregates.User;
 import com.agroapp.platform.iam.domain.model.commands.*;
 import com.agroapp.platform.iam.domain.model.commands.*;
+import com.agroapp.platform.iam.domain.model.events.UserProfileUpdatedEvent;
 import com.agroapp.platform.iam.domain.services.UserCommandService;
 import com.agroapp.platform.iam.infrastructure.persistence.jpa.repositories.UserRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,11 +19,14 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserRepository userRepository;
     private final HashingService hashingService;
     private final TokenService tokenService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public UserCommandServiceImpl(UserRepository userRepository, HashingService hashingService, TokenService tokenService) {
+    public UserCommandServiceImpl(UserRepository userRepository, HashingService hashingService,
+                                 TokenService tokenService, ApplicationEventPublisher eventPublisher) {
         this.userRepository = userRepository;
         this.hashingService = hashingService;
         this.tokenService = tokenService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -77,6 +82,10 @@ public class UserCommandServiceImpl implements UserCommandService {
         User user = userOptional.get();
         user.updateProfile(command.userName(), command.email(), command.phoneNumber());
         User updatedUser = userRepository.save(user);
+
+        // Publish event to notify other bounded contexts about the user profile update
+        eventPublisher.publishEvent(new UserProfileUpdatedEvent(this, updatedUser.getId(), updatedUser.getUserName()));
+
         return Optional.of(updatedUser);
     }
 

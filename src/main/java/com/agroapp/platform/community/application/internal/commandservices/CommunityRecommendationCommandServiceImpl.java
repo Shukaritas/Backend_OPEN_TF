@@ -53,6 +53,7 @@ public class CommunityRecommendationCommandServiceImpl implements CommunityRecom
         }
 
         CommunityRecommendation recommendation = new CommunityRecommendation(
+                command.userId(),
                 userName,
                 command.comment()
         );

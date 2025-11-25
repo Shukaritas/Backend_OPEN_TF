@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 public class CommunityRecommendation extends AuditableAbstractAggregateRoot<CommunityRecommendation> {
 
+    private Long userId;
     private String userName;
     private LocalDateTime commentDate;
     private String comment;
@@ -23,7 +24,8 @@ public class CommunityRecommendation extends AuditableAbstractAggregateRoot<Comm
         this.commentDate = LocalDateTime.now();
     }
 
-    public CommunityRecommendation(String userName, String comment) {
+    public CommunityRecommendation(Long userId, String userName, String comment) {
+        this.userId = userId;
         this.userName = userName;
         this.commentDate = LocalDateTime.now();
         this.comment = comment;
@@ -33,6 +35,10 @@ public class CommunityRecommendation extends AuditableAbstractAggregateRoot<Comm
         this.userName = userName;
         this.comment = comment;
         return this;
+    }
+
+    public void updateUserName(String userName) {
+        this.userName = userName;
     }
 }
 
